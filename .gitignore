@@ -1,0 +1,32 @@
+# Build results
+bin/
+obj/
+dist/
+
+# IDE
+.vs/
+.vscode/
+*.user
+*.suo
+*.sln.user
+
+# Runtime
+*.exe
+*.dll
+*.pdb
+
+# NuGet
+packages/
+.nuget/
+*.nupkg
+
+# Project files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.log
+*.swp
+*.swo
+*~
