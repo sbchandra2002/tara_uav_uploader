@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build *)",
+      "Bash(powershell -Command \"Get-ChildItem -Recurse -Directory | Select-Object -ExpandProperty FullName | Sort-Object\")",
+      "Bash(Get-ChildItem -Recurse -File -Include *.html, *.css, *.js, *.json)",
+      "Bash(Select-Object FullName)",
+      "PowerShell(Get-ChildItem -Recurse | Where-Object {$_.Extension -in '.cs', '.csproj', '.xaml', '.resx'} | Select-Object -ExpandProperty FullName | Sort-Object)",
+      "Bash(dir \"c:\\\\LocalDisk_Z\\\\projects\\\\uploader\\\\CUAVFlasher_Standalone_FixedUploaderOnly\" /b)",
+      "Bash(findstr /i \"logo png ico\")",
+      "Bash(taskkill /PID 36168 /F)",
+      "Bash(taskkill /PID 32704 /F)",
+      "PowerShell(Stop-Process -Id 36168 -Force -ErrorAction SilentlyContinue)",
+      "PowerShell(Stop-Process -Id 32704 -Force -ErrorAction SilentlyContinue)",
+      "Bash(dotnet publish *)",
+      "PowerShell(New-Item -ItemType Directory -Path \"c:\\\\LocalDisk_Z\\\\projects\\\\uploader\\\\CUAVFlasher_Standalone_FixedUploaderOnly\\\\installer_out\" -Force)",
+      "PowerShell(\"ok\")",
+      "PowerShell(\\(Get-Item \"c:\\\\LocalDisk_Z\\\\projects\\\\uploader\\\\CUAVFlasher_Standalone_FixedUploaderOnly\\\\installer_out\\\\TARA-Flasher-Setup.exe\"\\).Length / 1MB)"
+    ]
+  }
+}
