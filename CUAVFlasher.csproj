@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <RootNamespace>CUAVFlasher</RootNamespace>
+    <AssemblyName>CUAVFlasher</AssemblyName>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <ApplicationIcon>logo.ico</ApplicationIcon>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="System.Text.Json" Version="9.0.5" />
+  </ItemGroup>
+</Project>
