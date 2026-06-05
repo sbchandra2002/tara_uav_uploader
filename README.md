@@ -1,134 +1,134 @@
 # TARA-Flasher
 
-## Overview
-Standalone Windows Forms application for flashing firmware to CUAV X7 devices via STM32CubeProgrammer CLI.
+A Windows desktop app for flashing STM32-based flight-controller firmware over SWD via STM32CubeProgrammer CLI.
 
-## Project Structure
-```
-CUAVFlasher_Standalone_FixedUploaderOnly/
-├── TARA-Flasher.csproj      (Project configuration)
-├── TARA-Flasher.sln         (Solution file)
-├── Program.cs               (Application entry point)
-├── AdvancedMainForm.cs      (Main UI and logic)
-└── README.md                (This file)
-```
+---
 
 ## Requirements
-- .NET Framework 4.8
-- Windows Forms support
-- STM32CubeProgrammer CLI installed at: `C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer\bin\STM32_Programmer_CLI.exe`
-- Visual Studio 2022 or later (for development)
 
-## Features
-- **Dark/Light Theme Toggle** - Switch between dark and light color schemes
-- **Multi-File Firmware Upload** - Add and flash multiple binary files to different addresses
-- **Session Management** - Save and load flashing sessions as JSON files
-- **Password Protection** - Secure upload operations with password verification
-- **Storage Indicator** - Visual representation of flash memory usage
-- **Real-time Logging** - Console output from STM32CubeProgrammer CLI
-- **Drag & Drop Support** - Drag firmware files directly into the application
-- **ST-LINK Detection** - Detect connected programmer devices
+| Requirement | Notes |
+|---|---|
+| Windows 10 / 11 (64-bit) | |
+| .NET Framework 4.8 | Ships with Windows 10 1903 and later |
+| STM32CubeProgrammer | Required for flashing; the app will offer to install it automatically |
+| ST-LINK v2 / v3 probe | Connected via USB |
 
-## Building the Project
+---
+
+## Installation (end users)
+
+### Option A — Combined installer (recommended)
+
+1. Go to [**Releases**](../../releases) and download the latest `TARA-Flasher-Setup.exe`.
+2. If the release also includes `SetupSTM32CubeProgrammer_win64.exe`, download it into the **same folder**.
+3. Run `TARA-Flasher-Setup.exe` and follow the wizard.
+   - Installs to `C:\Program Files\TARA-Flasher\`
+   - Creates a desktop shortcut and Start Menu entry
+
+### Option B — Auto-install on first launch
+
+If STM32CubeProgrammer is not yet installed on the target PC:
+
+1. Run `TARA-Flasher-Setup.exe`.
+2. Copy `SetupSTM32CubeProgrammer_win64.exe` into `C:\Program Files\TARA-Flasher\`.
+3. Launch **TARA-Flasher**. The app detects the missing CLI and shows:
+
+   > **SETUP :: STM32CubeProgrammer Required**  
+   > Installer found: SetupSTM32CubeProgrammer_win64.exe  
+   > Click **Install** to run it now.
+
+4. Click **Install**, complete the wizard, then close it.  
+   TARA-Flasher auto-detects the CLI and is immediately ready to flash.
+
+---
+
+## Using the app
+
+```
+1. Connect ST-LINK probe + target board via SWD.
+2. The connection pill (top-right) turns GREEN when the device is detected.
+   Click it to confirm ("Connected").
+3. Menu > Set Firmware Folder — point to the folder with your
+   bootloader / metadata / firmware .bin or .hex files.
+4. Verify the file list and flash addresses in the FILE MAP table.
+5. Click UPLOAD — the animated overlay shows real-time per-file progress.
+6. A result dialog confirms success or lists any failed files.
+```
+
+### Connection pill states
+
+| Colour | Label | Meaning |
+|---|---|---|
+| Red | Connect | No ST-LINK detected |
+| Green | Connect | Device found — click to confirm |
+| Bright green | Connected | Actively connected, ready to flash |
+| Amber | Scanning… | Detection in progress |
+
+### Full chip erase
+
+**Menu > Full Chip Erase** wipes the entire flash (requires admin password).  
+The animated overlay turns red/orange during the erase.
+
+---
+
+## Building from source
+
 ```powershell
-# Restore dependencies
-dotnet restore TARA-Flasher.csproj
+# 1. Clone and switch to the release branch
+git clone https://github.com/sbchandra2002/tara_uav_uploader.git
+cd tara_uav_uploader
+git checkout v1
 
-# Build the project
-dotnet build TARA-Flasher.csproj
+# 2. Build the app
+dotnet publish TARA-Flasher.csproj -c Release -f net48 -o publish_out
 
-# Run the application
-dotnet run --project TARA-Flasher.csproj
+# 3. Create the installer  (requires Inno Setup 6)
+& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss
+# Output: installer_out\TARA-Flasher-Setup.exe
 ```
 
-## Usage
+To also bundle the STM32CubeProgrammer setup, place  
+`SetupSTM32CubeProgrammer_win64.exe` (or any file matching `STM32CubeProgrammer*.exe`)  
+next to `installer.iss` before running ISCC — it is picked up automatically.
 
-### Adding Files
-1. Click "Add Files" button or drag files directly into the grid
-2. Specify flash memory address for each file (e.g., 0x08000000)
-3. Files can be .bin or .hex format
+---
 
-### Uploading Firmware
-1. Click "Connect" to detect ST-LINK programmer
-2. Add firmware files and set addresses
-3. Click "Upload All" 
-4. Enter the default password (12345) when prompted
-5. Monitor progress in the log window
+## CI/CD — GitHub Actions
 
-### Managing Sessions
-- **Save Session**: Store current file list and addresses
-- **Load Session**: Restore previously saved configuration
+The workflow at [`.github/workflows/build.yml`](.github/workflows/build.yml) runs on every push to `v1` and on version tags.
 
-### Changing Password
-1. Click menu (☰)
-2. Select "Change Password"
-3. Enter new password
-4. Password is securely hashed with SHA256
+| Trigger | Result |
+|---|---|
+| Push to `v1` | Builds app + installer, uploads as a 30-day downloadable artifact |
+| Tag `v1.0.0` | Same **+** creates a public GitHub Release with both files attached |
 
-## Default Password
-- **Initial Password**: `12345`
-- Password is stored hashed in `password.dat` file
+### One-time setup: store the STM32 setup in a `deps` release
 
-## Configuration
-### CLI Path
-Edit `CLI_PATH` constant in `AdvancedMainForm.cs` if STM32CubeProgrammer is installed elsewhere:
-```csharp
-private const string CLI_PATH = @"C:\Program Files\STMicroelectronics\STM32Cube\STM32CubeProgrammer\bin\STM32_Programmer_CLI.exe";
+The STM32CubeProgrammer installer (~180 MB) exceeds GitHub's 100 MB per-file git limit.  
+Store it once in a special **`deps`** release and every CI run will download and bundle it automatically.
+
+```powershell
+# Run this once from your local machine (needs gh CLI + repo write access)
+gh release create deps SetupSTM32CubeProgrammer_win64.exe `
+  --title "Build Dependencies" `
+  --notes "Large build-time deps. Not a user-facing release."
 ```
 
-### Default Flash Address
-Edit `DefaultAddress` constant:
-```csharp
-private const string DefaultAddress = "0x08000000";
-```
+**What happens in CI after that:**
 
-## Troubleshooting
+1. Workflow downloads `SetupSTM32CubeProgrammer_win64.exe` from the `deps` release.
+2. Inno Setup bundles it inside `TARA-Flasher-Setup.exe`.
+3. On a version tag, both `TARA-Flasher-Setup.exe` **and** `SetupSTM32CubeProgrammer_win64.exe` are attached to the GitHub Release for direct user download.
 
-### "CLI not found" Error
-- Verify STM32CubeProgrammer is installed
-- Check the CLI path in code matches installation location
-- Ensure `STM32_Programmer_CLI.exe` exists at the specified path
+> If the `deps` release doesn't exist (or the download fails), the build continues without bundling — the installer still works and prompts the user to install STM32CubeProgrammer on first launch.
 
-### "No ST-LINK detected"
-- Check USB connection to programmer
-- Install ST-LINK USB drivers
-- Try running as Administrator
+---
 
-### Upload Failures
-- Verify file format (.bin or .hex)
-- Check memory addresses don't conflict
-- Ensure password is correct (default: 12345)
-- Check device flash memory isn't corrupted
+## Default passwords
 
-## Color Themes
+| Password | Default | Change via |
+|---|---|---|
+| Upload password | `12345` | Menu > Change Upload Password |
+| Admin password | `Tara@123` | Menu > Change Admin Password |
 
-### Dark Theme (Default)
-- Background: #1C202E
-- Panel: #242933
-- Accent: #20B9FF
-- Text: #DCE6F5
-
-### Light Theme
-- Background: #EEF3FA
-- Panel: #DCE7F5
-- Accent: #3C8CDC
-- Text: #282D2D
-
-## Technical Details
-- **Language**: C# 7.3
-- **Framework**: .NET Framework 4.8
-- **UI Framework**: Windows Forms
-- **Security**: SHA256 password hashing with salt
-- **Process Communication**: Async/await with process redirection
-
-## File Layout
-- **FileName**: Binary file name
-- **Address**: Hex memory address (e.g., 0x08000000)
-- **Size**: File size in bytes
-- **Status**: Pending/Flashing/Success/Failed/Missing/Invalid Address
-
-## License
-[Add license information here]
-
-## Contact
-[Add contact information here]
+> Change both passwords before distributing to a team.

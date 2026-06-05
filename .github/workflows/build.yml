@@ -22,6 +22,27 @@ jobs:
         with:
           dotnet-version: '8.0.x'
 
+      # ── Download STM32CubeProgrammer setup from the `deps` release ────────────
+      # Upload the file once via:
+      #   gh release create deps SetupSTM32CubeProgrammer_win64.exe --title "Build Dependencies" --notes "Large build deps"
+      # The installer.iss wildcard will auto-bundle it if present.
+      - name: Download STM32CubeProgrammer setup from deps release
+        id: stm32
+        continue-on-error: true
+        run: |
+          gh release download deps --pattern "SetupSTM32CubeProgrammer*.exe" --dir . 2>$null
+          $found = Get-ChildItem "SetupSTM32CubeProgrammer*.exe" -ErrorAction SilentlyContinue
+          if ($found) {
+            Write-Host "STM32CubeProgrammer installer found: $($found.Name) — will be bundled."
+            "bundled=true" >> $env:GITHUB_OUTPUT
+          } else {
+            Write-Host "STM32CubeProgrammer installer not in deps release — building without it."
+            "bundled=false" >> $env:GITHUB_OUTPUT
+          }
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
+
       - name: Restore dependencies
         run: dotnet restore TARA-Flasher.csproj
 
@@ -36,24 +57,37 @@ jobs:
       - name: Install Inno Setup 6
         run: choco install innosetup --no-progress -y
 
+      # installer.iss already has skipifsourcedoesntexist wildcards for STM32*.exe
       - name: Build installer
         run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss'
         shell: pwsh
 
-      # Always upload the installer so it's downloadable from the Actions run page
-      - name: Upload installer artifact
+      # Always upload the TARA-Flasher installer as a build artifact
+      - name: Upload TARA-Flasher installer artifact
         uses: actions/upload-artifact@v4
         with:
           name: TARA-Flasher-Setup
           path: installer_out/TARA-Flasher-Setup.exe
           retention-days: 30
 
-      # On a version tag (e.g. v1.0.0) — create a proper GitHub Release
+      # Upload the STM32 setup as a separate artifact too (if it was downloaded)
+      - name: Upload STM32CubeProgrammer setup artifact
+        if: steps.stm32.outputs.bundled == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: SetupSTM32CubeProgrammer
+          path: SetupSTM32CubeProgrammer*.exe
+          retention-days: 30
+
+      # On a version tag (e.g. v1.0.0) — create a GitHub Release with both files
       - name: Create GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
         run: |
-          gh release create "${{ github.ref_name }}" `
-            "installer_out/TARA-Flasher-Setup.exe#TARA-Flasher-Setup.exe" `
+          $assets = @("installer_out/TARA-Flasher-Setup.exe#TARA-Flasher-Setup.exe")
+          $stm32 = Get-ChildItem "SetupSTM32CubeProgrammer*.exe" -ErrorAction SilentlyContinue
+          if ($stm32) { $assets += "$($stm32.FullName)#$($stm32.Name)" }
+
+          gh release create "${{ github.ref_name }}" @assets `
             --title "TARA-Flasher ${{ github.ref_name }}" `
             --generate-notes
         env:
