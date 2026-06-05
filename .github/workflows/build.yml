@@ -1,0 +1,61 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [v1]
+    tags: ['v*.*.*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore TARA-Flasher.csproj
+
+      - name: Publish (Release / net48)
+        run: >
+          dotnet publish TARA-Flasher.csproj
+          -c Release
+          -f net48
+          -o publish_out
+          --no-restore
+
+      - name: Install Inno Setup 6
+        run: choco install innosetup --no-progress -y
+
+      - name: Build installer
+        run: '& "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer.iss'
+        shell: pwsh
+
+      # Always upload the installer so it's downloadable from the Actions run page
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: TARA-Flasher-Setup
+          path: installer_out/TARA-Flasher-Setup.exe
+          retention-days: 30
+
+      # On a version tag (e.g. v1.0.0) — create a proper GitHub Release
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          gh release create "${{ github.ref_name }}" `
+            "installer_out/TARA-Flasher-Setup.exe#TARA-Flasher-Setup.exe" `
+            --title "TARA-Flasher ${{ github.ref_name }}" `
+            --generate-notes
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: pwsh
