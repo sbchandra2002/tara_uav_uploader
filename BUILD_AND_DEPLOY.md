@@ -1,7 +1,7 @@
-# CUAVFlasher - Build and Deployment Guide
+# TARA-Flasher - Build and Deployment Guide
 
 ## Overview
-This guide explains how to build, create an installer, and package your CUAVFlasher application for distribution.
+This guide explains how to build, create an installer, and package your TARA-Flasher application for distribution.
 
 ## Prerequisites
 - **Windows 10/11**
@@ -14,19 +14,19 @@ This guide explains how to build, create an installer, and package your CUAVFlas
 - **build_package.ps1** - Automated PowerShell script that handles the entire build process
 - **installer.iss** - Inno Setup configuration file for creating the installer
 - **logo.ico** - Application icon (displayed in installer and shortcuts)
-- **CUAVFlasher.csproj** - Project file with application icon configuration
+- **TARA-Flasher.csproj** - Project file with application icon configuration
 
 ### Output Directory
 After running the build script, the following files will be created in the `dist/` folder:
 
 ```
 dist/
-├── CUAVFlasher/              # All application files
-│   ├── CUAVFlasher.exe       # Main application
+├── TARA-Flasher/              # All application files
+│   ├── TARA-Flasher.exe       # Main application
 │   ├── logo.ico              # Application icon
 │   └── (other dependencies)
-├── CUAVFlasher_Setup.exe     # Installer executable
-└── CUAVFlasher_Package.zip   # Packaged installer for distribution
+├── TARA-Flasher_Setup.exe     # Installer executable
+└── TARA-Flasher_Package.zip   # Packaged installer for distribution
 ```
 
 ## Quick Start
@@ -51,12 +51,12 @@ powershell -ExecutionPolicy Bypass -File .\build_package.ps1
 ### Step 3: Distribute to Users
 After the script completes, you'll have:
 
-- **CUAVFlasher_Setup.exe** - The installer (recommended for distribution)
-- **CUAVFlasher_Package.zip** - Zipped installer (for email/file sharing)
+- **TARA-Flasher_Setup.exe** - The installer (recommended for distribution)
+- **TARA-Flasher_Package.zip** - Zipped installer (for email/file sharing)
 
 **Give users either:**
-- `dist\CUAVFlasher_Setup.exe` - Run directly
-- `dist\CUAVFlasher_Package.zip` - Extract and run the .exe inside
+- `dist\TARA-Flasher_Setup.exe` - Run directly
+- `dist\TARA-Flasher_Package.zip` - Extract and run the .exe inside
 
 ---
 
@@ -68,12 +68,12 @@ Removes the `dist/` folder to ensure a clean build.
 ### Step 2: Build in Release Mode
 Compiles the project with optimizations:
 ```
-dotnet build .\CUAVFlasher.csproj -c Release
+dotnet build .\TARA-Flasher.csproj -c Release
 ```
 
 ### Step 3: Prepare Distribution Files
-Copies all compiled files to `dist\CUAVFlasher\`:
-- CUAVFlasher.exe
+Copies all compiled files to `dist\TARA-Flasher\`:
+- TARA-Flasher.exe
 - All dependent assemblies
 - logo.ico
 - Configuration files
@@ -84,25 +84,25 @@ Uses Inno Setup to create the installer:
 C:\Program Files (x86)\Inno Setup 6\ISCC.exe installer.iss
 ```
 
-This creates: `dist\CUAVFlasher_Setup.exe`
+This creates: `dist\TARA-Flasher_Setup.exe`
 
 ### Step 5: Create Distribution Package
 Packages the installer into a ZIP file:
-- File: `dist\CUAVFlasher_Package.zip`
-- Contents: Only the CUAVFlasher_Setup.exe
+- File: `dist\TARA-Flasher_Package.zip`
+- Contents: Only the TARA-Flasher_Setup.exe
 
 ---
 
 ## What the Installer Does
 
-When users run **CUAVFlasher_Setup.exe**, the installer will:
+When users run **TARA-Flasher_Setup.exe**, the installer will:
 
-1. **Extract files** to: `C:\Users\{UserName}\AppData\Local\CUAVFlasher\`
+1. **Extract files** to: `C:\Users\{UserName}\AppData\Local\TARA-Flasher\`
 
 2. **Create shortcuts:**
-   - Start Menu: "CUAV Flasher"
-   - Desktop: "CUAV Flasher" (optional)
-   - Quick Launch: "CUAV Flasher" (optional)
+   - Start Menu: "TARA-Flasher"
+   - Desktop: "TARA-Flasher" (optional)
+   - Quick Launch: "TARA-Flasher" (optional)
 
 3. **Check for STM32CubeProgrammer:**
    - If not found, prompts user to download from:
@@ -128,12 +128,12 @@ When users run **CUAVFlasher_Setup.exe**, the installer will:
 **Solution:**
 1. Ensure .NET Framework 4.8 is installed
 2. Run: `dotnet restore`
-3. Try building manually: `dotnet build .\CUAVFlasher.csproj -c Release`
+3. Try building manually: `dotnet build .\TARA-Flasher.csproj -c Release`
 
 ### Issue: Files seem to be missing from the installer
 
 **Solution:**
-1. Check that `dist\CUAVFlasher\` folder contains all files
+1. Check that `dist\TARA-Flasher\` folder contains all files
 2. Verify `logo.ico` exists in the project root
 3. Delete the `dist/` folder and run the script again
 
@@ -162,7 +162,7 @@ If you need to manually compile the Inno Setup script:
 
 ## Version Information
 
-- **Application:** CUAV Flasher v1.0
+- **Application:** TARA-Flasher v1.0
 - **Target:** .NET Framework 4.8
 - **Platform:** Windows x86
 - **Installer:** Inno Setup 6
@@ -172,9 +172,9 @@ If you need to manually compile the Inno Setup script:
 
 ## File Size Estimates
 
-- **CUAVFlasher.exe:** ~1-5 MB (compiled application)
-- **CUAVFlasher_Setup.exe:** ~3-8 MB (compressed installer)
-- **CUAVFlasher_Package.zip:** ~2-6 MB (zipped installer)
+- **TARA-Flasher.exe:** ~1-5 MB (compiled application)
+- **TARA-Flasher_Setup.exe:** ~3-8 MB (compressed installer)
+- **TARA-Flasher_Package.zip:** ~2-6 MB (zipped installer)
 
 ---
 
@@ -195,7 +195,7 @@ For issues building or deploying:
 
 1. Replace `logo.ico` in the project root
 2. The application icon settings are configured in:
-   - `CUAVFlasher.csproj` → `<ApplicationIcon>logo.ico</ApplicationIcon>`
+   - `TARA-Flasher.csproj` → `<ApplicationIcon>logo.ico</ApplicationIcon>`
    - `installer.iss` → `SetupIconFile=logo.ico`
    - `AdvancedMainForm.cs` → Icon loading code
 
@@ -218,7 +218,7 @@ STM32CLIPath := ExpandConstant('C:\Program Files\STMicroelectronics\STM32Cube\ST
 
 ## License
 
-This build system is part of the CUAVFlasher project.
+This build system is part of the TARA-Flasher project.
 
 ---
 

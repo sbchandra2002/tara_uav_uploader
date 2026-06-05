@@ -1,13 +1,13 @@
-# TARA-UAV Firmware Uploader (CUAVFlasher)
+# TARA-Flasher
 
 ## Overview
 Standalone Windows Forms application for flashing firmware to CUAV X7 devices via STM32CubeProgrammer CLI.
 
 ## Project Structure
 ```
-CUAVFlasher_Standalone/
-├── CUAVFlasher.csproj       (Project configuration)
-├── CUAVFlasher.sln          (Solution file)
+CUAVFlasher_Standalone_FixedUploaderOnly/
+├── TARA-Flasher.csproj      (Project configuration)
+├── TARA-Flasher.sln         (Solution file)
 ├── Program.cs               (Application entry point)
 ├── AdvancedMainForm.cs      (Main UI and logic)
 └── README.md                (This file)
@@ -32,13 +32,13 @@ CUAVFlasher_Standalone/
 ## Building the Project
 ```powershell
 # Restore dependencies
-dotnet restore CUAVFlasher.csproj
+dotnet restore TARA-Flasher.csproj
 
 # Build the project
-dotnet build CUAVFlasher.csproj
+dotnet build TARA-Flasher.csproj
 
 # Run the application
-dotnet run --project CUAVFlasher.csproj
+dotnet run --project TARA-Flasher.csproj
 ```
 
 ## Usage

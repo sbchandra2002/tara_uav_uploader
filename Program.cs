@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace CUAVFlasher
+namespace TARAFlasher
 {
     static class Program
     {
@@ -10,7 +10,13 @@ namespace CUAVFlasher
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new AdvancedMainForm());
+
+            using (var splash = new SplashForm())
+                splash.ShowDialog();
+
+            var mainForm = new AdvancedMainForm();
+            mainForm.Shown += (s, e) => { mainForm.BringToFront(); mainForm.Activate(); };
+            Application.Run(mainForm);
         }
     }
 }

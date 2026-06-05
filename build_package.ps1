@@ -1,4 +1,4 @@
-# CUAVFlasher Build and Package Script
+# TARA-Flasher Build and Package Script
 # This script automates the entire process of building, creating installer, and packaging
 
 $ErrorActionPreference = "Stop"
@@ -26,7 +26,7 @@ function Test-Inno {
 
 try {
     Write-Status "========================================" $info
-    Write-Status "CUAVFlasher Build and Package Script" $info
+    Write-Status "TARA-Flasher Build and Package Script" $info
     Write-Status "========================================" $info
     
     # Get script directory
@@ -43,7 +43,7 @@ try {
     # Step 2: Build project in Release mode
     Write-Status "Step 2: Building project in Release mode..." $info
     Push-Location $scriptDir
-    & dotnet build .\CUAVFlasher.csproj -c Release
+    & dotnet build .\TARA-Flasher.csproj -c Release
     if ($LASTEXITCODE -ne 0) {
         throw "Build failed with exit code $LASTEXITCODE"
     }
@@ -53,7 +53,7 @@ try {
     # Step 3: Create dist structure and copy files
     Write-Status "Step 3: Copying release files to dist folder..." $info
     $sourcePath = "$scriptDir\bin\Release\net48"
-    $distPath = "$scriptDir\dist\CUAVFlasher"
+    $distPath = "$scriptDir\dist\TARA-Flasher"
     
     # Create destination folder
     New-Item -ItemType Directory -Path $distPath -Force | Out-Null
@@ -109,8 +109,8 @@ try {
     
     # Step 6: Create zip package
     Write-Status "Step 6: Creating zip package..." $info
-    $installerPath = "$scriptDir\dist\CUAVFlasher_Setup.exe"
-    $zipPath = "$scriptDir\dist\CUAVFlasher_Package.zip"
+    $installerPath = "$scriptDir\dist\TARA-Flasher_Setup.exe"
+    $zipPath = "$scriptDir\dist\TARA-Flasher_Package.zip"
     
     if (Test-Path $installerPath) {
         # Remove old zip if exists
@@ -142,21 +142,21 @@ try {
     Write-Status ""
     Write-Status "Output Files:" $info
     
-    if (Test-Path "$scriptDir\dist\CUAVFlasher_Setup.exe") {
-        Write-Status "  [OK] Installer:  dist\CUAVFlasher_Setup.exe" $success
-        Write-Status "  [OK] Package:    dist\CUAVFlasher_Package.zip" $success
+    if (Test-Path "$scriptDir\dist\TARA-Flasher_Setup.exe") {
+        Write-Status "  [OK] Installer:  dist\TARA-Flasher_Setup.exe" $success
+        Write-Status "  [OK] Package:    dist\TARA-Flasher_Package.zip" $success
     } else {
         Write-Status "  [NO] Installer:  NOT CREATED (install Inno Setup 6 to create)" $warning
         Write-Status "  [NO] Package:    NOT CREATED" $warning
     }
     
-    Write-Status "  [OK] Files Dir:  dist\CUAVFlasher\" $success
+    Write-Status "  [OK] Files Dir:  dist\TARA-Flasher\" $success
     Write-Status ""
     
-    if (Test-Path "$scriptDir\dist\CUAVFlasher_Setup.exe") {
+    if (Test-Path "$scriptDir\dist\TARA-Flasher_Setup.exe") {
         Write-Status "To distribute:" $info
-        Write-Status "  Option 1: Send dist\CUAVFlasher_Package.zip to users" $success
-        Write-Status "  Option 2: Send dist\CUAVFlasher_Setup.exe directly" $success
+        Write-Status "  Option 1: Send dist\TARA-Flasher_Package.zip to users" $success
+        Write-Status "  Option 2: Send dist\TARA-Flasher_Setup.exe directly" $success
         Write-Status ""
     } else {
         Write-Status "NEXT STEPS:" $warning
